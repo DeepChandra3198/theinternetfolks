@@ -1,0 +1,51 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String      @id
+  name             String
+  email            String      @unique
+  password         String
+  created_at       DateTime
+  updated_at       DateTime
+  ownedCommunities Community[] @relation("ownedCommunities")
+  Member           Member[]
+}
+
+model Community {
+  id         String   @id
+  name       String
+  slug       String     @unique
+  owner      String
+  created_at DateTime
+  updated_at DateTime
+  members    Member[]
+  user       User     @relation("ownedCommunities", fields: [owner], references: [id])
+}
+
+model Role {
+  id         String   @id
+  name       String   @unique
+  scopes     String
+  created_at DateTime
+  updated_at DateTime
+  Member     Member[]
+}
+
+model Member {
+  id         String    @id
+  community  String
+  user       String
+  role       String
+  created_at DateTime
+  communityM Community @relation(fields: [community], references: [id])
+  userM      User      @relation(fields: [user], references: [id])
+  roleM      Role      @relation(fields: [role], references: [id])
+}
